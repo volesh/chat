@@ -1,5 +1,8 @@
+import {
+  IUserResponse,
+  UserResponse,
+} from './../../general/interfaces/user.interfaces';
 import { IReqUser } from './../auth/interface/request.user.interfase';
-import { UserPresenter } from './user.presenter';
 import { UpdateUserDto } from './dto/update.user.dto';
 import { CreateUserDto } from './dto/create.user.dto';
 import { Body, Controller, Delete, Post, Put, UseGuards } from '@nestjs/common';
@@ -11,7 +14,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { UserResponseDto } from './dto/user.response.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { HttpCode, Req } from '@nestjs/common/decorators';
 import { Request } from 'express';
@@ -24,14 +26,12 @@ export class UsersController {
   // Register !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   @ApiCreatedResponse({
     description: 'User has been successfully created.',
-    type: UserResponseDto,
+    type: UserResponse,
   })
   @ApiBody({ type: CreateUserDto })
-  @UseGuards(AuthGuard('jwt'))
   @Post()
-  async createUser(@Body() user: CreateUserDto): Promise<UserResponseDto> {
-    const createdUser = await this.usersService.createUser(user);
-    return UserPresenter.toResponseDto(createdUser);
+  async createUser(@Body() user: CreateUserDto): Promise<IUserResponse> {
+    return this.usersService.createUser(user);
   }
   // .............................................................................
 
@@ -39,7 +39,7 @@ export class UsersController {
   @ApiResponse({
     status: 204,
     description: 'User has been successfully updated.',
-    type: UserResponseDto,
+    type: UserResponse,
   })
   @ApiBearerAuth()
   @ApiBody({ type: UpdateUserDto })
@@ -48,12 +48,8 @@ export class UsersController {
   async upbdateUser(
     @Body() userForUpdate: UpdateUserDto,
     @Req() req: Request,
-  ): Promise<UserResponseDto> {
-    const updatedUser = await this.usersService.updateuser(
-      userForUpdate,
-      req.user as IReqUser,
-    );
-    return UserPresenter.toResponseDto(updatedUser);
+  ): Promise<IUserResponse> {
+    return this.usersService.updateuser(userForUpdate, req.user as IReqUser);
   }
   // .............................................................................
 

@@ -1,10 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ChatEntity } from 'src/modules/chats/entites/chat.entity';
+import { MessageEntity } from 'src/modules/chats/entites/message.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -32,9 +35,20 @@ export class UserEntity {
   @Column()
   password: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @OneToMany(() => MessageEntity, (message: MessageEntity) => message.user, {})
+  messages: MessageEntity[];
 
-  @UpdateDateColumn()
-  updatedAt: Date;
+  @ManyToMany(() => ChatEntity, (chat: ChatEntity) => chat.users)
+  @JoinTable({
+    name: 'users_chats',
+    joinColumn: {
+      name: 'chat_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'user_id',
+      referencedColumnName: 'id',
+    },
+  })
+  chats: ChatEntity[];
 }

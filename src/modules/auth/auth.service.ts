@@ -1,6 +1,5 @@
 import { IReqUser } from './interface/request.user.interfase';
-import { UserPresenter } from './../users/user.presenter';
-import { UserResponseDto } from './../users/dto/user.response.dto';
+import { UserPresenter } from '../users/presenters/user.presenter';
 import { PasswordHelper } from './../../general/helpers/password.helper';
 import { TokensEntity } from './entities/tokens.entity';
 import { AuthDto } from './dto/auth.dto';
@@ -10,6 +9,7 @@ import { UserEntity } from '../users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { envsConfig } from 'src/general/configs/envs.config';
+import { IUserResponse } from 'src/general/interfaces/user.interfaces';
 
 @Injectable()
 export class AuthService {
@@ -19,13 +19,12 @@ export class AuthService {
     @InjectRepository(TokensEntity)
     private readonly tokensRepository: Repository<TokensEntity>,
     private readonly passwordHelper: PasswordHelper,
-    // private readonly tokensHelper: TokensHelper,
     private jwtService: JwtService,
   ) {}
 
   // LOGIN !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   async login(data: AuthDto): Promise<{
-    user: UserResponseDto;
+    user: IUserResponse;
     tokens: { accessToken: string; refreshToken: string };
   }> {
     const user = await this.userRepository.findOne({
@@ -80,7 +79,7 @@ export class AuthService {
   async generateToken(data: { phone: string; id: string }) {
     const accessToken = await this.jwtService.signAsync(data, {
       secret: envsConfig.access_secret_key,
-      expiresIn: '1d',
+      expiresIn: '15m',
     });
     const refreshToken = await this.jwtService.signAsync(data, {
       secret: envsConfig.refresh_secret_key,

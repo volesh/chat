@@ -10,6 +10,8 @@ import {
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common/exceptions';
+import { UserPresenter } from './presenters/user.presenter';
+import { IUserResponse } from 'src/general/interfaces/user.interfaces';
 
 @Injectable()
 export class UsersService {
@@ -20,13 +22,13 @@ export class UsersService {
   ) {}
 
   // GET ALL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  async getAll() {
-    return this.userRepository.find();
-  }
+  // private async getAll() {
+  //   return this.userRepository.find();
+  // }
   // .............................................................................
 
   // CREATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  async createUser(user: CreateUserDto): Promise<UserEntity> {
+  async createUser(user: CreateUserDto): Promise<IUserResponse> {
     const isExist = await this.isUserExist({ phone: user.phone });
     if (isExist) {
       throw new BadRequestException(
@@ -34,20 +36,28 @@ export class UsersService {
       );
     }
     const hashedPass = await this.passwordHelper.hashPass(user.password);
-    return this.userRepository.save({ ...user, password: hashedPass });
+    const createdUser = await this.userRepository.save({
+      ...user,
+      password: hashedPass,
+    });
+    return UserPresenter.toResponseDto(createdUser);
   }
   // .............................................................................
 
   // UPDATE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  async updateuser(user: UpdateUserDto, { id }: IReqUser): Promise<UserEntity> {
+  async updateuser(
+    user: UpdateUserDto,
+    { id }: IReqUser,
+  ): Promise<IUserResponse> {
     const isExist = await this.isUserExist({ id });
     if (!isExist) {
       throw new NotFoundException('User not found');
     }
     await this.userRepository.update(id, user);
-    return this.userRepository.findOne({
+    const updatedUser = await this.userRepository.findOne({
       where: { id },
     });
+    return UserPresenter.toResponseDto(updatedUser);
   }
   // .............................................................................
 

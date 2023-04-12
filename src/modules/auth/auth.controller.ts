@@ -1,6 +1,6 @@
 import { IReqUser } from './interface/request.user.interfase';
 import { AuthDto } from './dto/auth.dto';
-import { Controller, HttpStatus } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { Get, Post, Body, UseGuards, Req } from '@nestjs/common/decorators';
 import { AuthService } from './auth.service';
 import {
@@ -11,12 +11,12 @@ import {
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
-import { UserResponseDto } from '../users/dto/user.response.dto';
 import { TokensDto } from './dto/tokens.dto';
+import { IUserResponse } from 'src/general/interfaces/user.interfaces';
 
 class LoginResponseDto {
   @ApiProperty()
-  user: UserResponseDto;
+  user: IUserResponse;
 
   @ApiProperty()
   tokens: TokensDto;

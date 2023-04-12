@@ -9,6 +9,8 @@ import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { ChatsModule } from '../chats/chats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ChatEntity } from '../chats/entites/chat.entity';
+import { MessageEntity } from '../chats/entites/message.entity';
 
 @Module({
   imports: [
@@ -22,7 +24,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: envsConfig.postgres_user,
       password: envsConfig.postgres_password,
       database: envsConfig.postgres_name,
-      entities: [UserEntity, TokensEntity],
+      entities: [UserEntity, TokensEntity, ChatEntity, MessageEntity],
       synchronize: true,
     }),
   ],
